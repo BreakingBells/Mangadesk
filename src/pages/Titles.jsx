@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { base44 } from "@/api/base44Client";
+import { mangaApi } from "@/api/mangaClient";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -39,7 +39,7 @@ export default function Titles() {
     let active = true;
     setLoading(true);
     setError("");
-    base44.functions
+    mangaApi
       .invoke("mangadexSearch", { query, country, section, limit: PAGE_SIZE, offset: 0 })
       .then((res) => {
         if (!active) return;
@@ -53,7 +53,7 @@ export default function Titles() {
 
   const loadMore = () => {
     setLoadingMore(true);
-    base44.functions
+    mangaApi
       .invoke("mangadexSearch", { query, country, section, limit: PAGE_SIZE, offset: items.length })
       .then((res) => {
         setItems((prev) => [...prev, ...(res.data.items || [])]);

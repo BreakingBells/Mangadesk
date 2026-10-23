@@ -44,6 +44,10 @@ export default async function (req) {
       }),
     ]);
 
+    if ([spotlight, topRated, recentlyAdded, latestChapters].every((result) => result.status === "rejected")) {
+      throw spotlight.reason;
+    }
+
     const spotlightList = settled(spotlight, { data: [] }).data || [];
     const chapterList = (settled(latestChapters, { data: [] }).data || []).map(normalizeChapter);
 
@@ -51,13 +55,10 @@ export default async function (req) {
     const mangaIds = [...new Set(chapterList.map((c) => c.mangaId).filter(Boolean))].slice(0, 20);
     let covers = {};
     if (mangaIds.length > 0) {
-      const coverRes = settled(
-        await Promise.allSettled([
-          mdFetch("/manga", { ids: mangaIds, "includes[]": "cover_art", limit: 20 }).then((r) => r),
-        ]),
-        null
-      );
-      const list = coverRes?.[0]?.status === "fulfilled" ? coverRes[0].value.data || [] : [];
+      const [coverRes] = await Promise.allSettled([
+        mdFetch("/manga", { "ids[]": mangaIds, "includes[]": "cover_art", limit: 20 }),
+      ]);
+      const list = settled(coverRes, { data: [] }).data || [];
       covers = Object.fromEntries(list.map((m) => [m.id, normalizeManga(m, "256").cover]));
     }
 

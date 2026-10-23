@@ -45,6 +45,21 @@ base44 dev --remote
 
 ## Publish Your Changes
 
+### Netlify hosting
+
+The manga catalogue and reader use the four MangaDex endpoints in `netlify/functions/`.
+These reuse the handlers in `base44/functions/` and deploy with the Netlify site;
+they do not require a separate Base44 backend deployment or MangaDex credentials.
+Account features continue to use the existing Base44 client.
+
+Run the manga endpoint regression checks with:
+
+```bash
+node --experimental-strip-types --test tests/manga.test.mjs
+```
+
+### Base44 publishing
+
 After pushing your changes to git, open the Base44 dashboard and publish the app:
 
 ```bash
