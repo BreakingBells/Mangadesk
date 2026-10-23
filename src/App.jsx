@@ -8,6 +8,8 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from './pages/Home';
 import Titles from './pages/Titles';
 import Settings from './pages/Settings';
+import TitleDetail from './pages/TitleDetail';
+import ChapterReader from './pages/ChapterReader';
 import Layout from './components/Layout';
 // Add page imports here
 
@@ -37,6 +39,8 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Home />} />
         <Route path="/Titles" element={<Titles />} />
         <Route path="/Settings" element={<Settings />} />
+        <Route path="/Title/:id" element={<TitleDetail />} />
+        <Route path="/Chapter/:id" element={<ChapterReader />} />
         {/* Add your page Route elements here */}
       </Route>
       <Route path="*" element={<PageNotFound />} />
