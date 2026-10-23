@@ -1,0 +1,25 @@
+{
+  "name": "MangaTitle",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "section": {
+      "type": "string",
+      "description": "top_rated or recently_added"
+    },
+    "rank": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}
