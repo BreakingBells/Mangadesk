@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { mangaApi } from "@/api/mangaClient";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, BookOpen, Clock, Loader2, Users } from "lucide-react";
@@ -21,7 +21,7 @@ export default function TitleDetail() {
     setLoading(true);
     setError("");
     setData(null);
-    base44.functions
+    mangaApi
       .invoke("mangadexTitle", { id, offset: 0 })
       .then((res) => { if (active) setData(res.data); })
       .catch((err) => { if (active) setError(err?.response?.data?.error || err.message || "Unexpected error"); })
@@ -31,7 +31,7 @@ export default function TitleDetail() {
 
   const loadMore = () => {
     setLoadingMore(true);
-    base44.functions
+    mangaApi
       .invoke("mangadexTitle", { id, offset: data.chapters.length })
       .then((res) => setData((prev) => ({ ...prev, chapters: [...prev.chapters, ...(res.data.chapters || [])] })))
       .catch((err) => setError(err?.response?.data?.error || err.message || "Unexpected error"))

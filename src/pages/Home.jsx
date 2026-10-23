@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { mangaApi } from "@/api/mangaClient";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Star, Flame, Zap } from "lucide-react";
 import AnimatedElement from "@/components/manga/AnimatedElement";
@@ -50,7 +50,7 @@ export default function Home() {
     let active = true;
     setLoading(true);
     setError("");
-    base44.functions
+    mangaApi
       .invoke("mangadexHome", {})
       .then((res) => { if (active) setData(res.data); })
       .catch((err) => { if (active) setError(err?.response?.data?.error || err.message || "Unexpected error"); })
