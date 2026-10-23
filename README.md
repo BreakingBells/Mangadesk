@@ -65,3 +65,5 @@ Support: [https://app.base44.com/support](https://app.base44.com/support)
 ---
 
 [![Restore to base44](https://img.shields.io/badge/Restore%20to-BASE44-orange?style=for-the-badge&logo=rocket)](https://app.base44.com/apps)
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/bb2c2d52-98ce-4130-9e4f-06fc38f3f64c/deploy-status)](https://app.netlify.com/projects/mangadump/deploys)
