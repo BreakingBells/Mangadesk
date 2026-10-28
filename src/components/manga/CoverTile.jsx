@@ -19,7 +19,7 @@ export default function CoverTile({ item }) {
       )}
 
       <span className="absolute top-2 left-2 bg-background/90 backdrop-blur-md text-foreground text-[10px] font-bold px-2 py-1 rounded shadow-sm z-10">
-        {item.country}
+        {item.country} · {item.source || "MangaDex"}
       </span>
 
       <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none mix-blend-overlay" />

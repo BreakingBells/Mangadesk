@@ -67,3 +67,22 @@ Support: [https://app.base44.com/support](https://app.base44.com/support)
 [![Restore to base44](https://img.shields.io/badge/Restore%20to-BASE44-orange?style=for-the-badge&logo=rocket)](https://app.base44.com/apps)
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/bb2c2d52-98ce-4130-9e4f-06fc38f3f64c/deploy-status)](https://app.netlify.com/projects/mangadump/deploys)
+
+## Manga sources
+
+The catalogue requests MangaDex and MangaPill simultaneously by default. Both
+providers run through Netlify Functions, so manga browsing does not depend on
+hosted Base44 functions. Each provider keeps its own pagination cursor; a failed
+provider is retried without skipping its results. Use the
+source selector on Titles to browse either provider individually. MangaPill titles
+have distinct identifiers so chapter lists and reader navigation stay with the
+selected provider. The Top Rated shelf uses MangaDex because MangaPill does not
+provide ratings.
+
+MangaPill runs through `netlify/functions/mangapill.mjs`, adapted from the supplied
+MIT-licensed scraper (license in `netlify/lib/MANGAPILL-LICENSE`). It fetches public
+pages server-side without requiring a separate scraper deployment or credentials.
+Use Netlify Dev on port 8889 when testing this integration locally. Upstream
+outages appear as availability notices while successful sources remain visible.
+
+Run the source integration checks with `node --test tests/*.test.mjs`.

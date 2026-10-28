@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { mangaClient } from "@/api/mangaClient";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, BookOpen, Clock, Loader2, Users } from "lucide-react";
@@ -21,7 +21,7 @@ export default function TitleDetail() {
     setLoading(true);
     setError("");
     setData(null);
-    base44.functions
+    mangaClient
       .invoke("mangadexTitle", { id, offset: 0 })
       .then((res) => { if (active) setData(res.data); })
       .catch((err) => { if (active) setError(err?.response?.data?.error || err.message || "Unexpected error"); })
@@ -31,7 +31,7 @@ export default function TitleDetail() {
 
   const loadMore = () => {
     setLoadingMore(true);
-    base44.functions
+    mangaClient
       .invoke("mangadexTitle", { id, offset: data.chapters.length })
       .then((res) => setData((prev) => ({ ...prev, chapters: [...prev.chapters, ...(res.data.chapters || [])] })))
       .catch((err) => setError(err?.response?.data?.error || err.message || "Unexpected error"))
@@ -79,7 +79,7 @@ export default function TitleDetail() {
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.25em] text-primary mb-3">
-                {manga.country} • {manga.status || "unknown"}
+                {manga.source || "MangaDex"} • {manga.country} • {manga.status || "unknown"}
               </div>
               <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight leading-[1.1] text-foreground">{manga.title}</h1>
 
@@ -145,7 +145,7 @@ export default function TitleDetail() {
                         <span className="flex items-center gap-1.5"><Clock className="h-3 w-3" /> {timeAgo(c.readableAt)}</span>
                       </div>
                     </div>
-                    <span className="text-xs font-bold text-primary shrink-0">{c.pages} pages</span>
+                    <span className="text-xs font-bold text-primary shrink-0">{c.pages == null ? "Read chapter" : `${c.pages} pages`}</span>
                   </Link>
                 </AnimatedElement>
               ))}
