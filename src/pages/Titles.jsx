@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { base44 } from "@/api/base44Client";
+import { mangaClient } from "@/api/mangaClient";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,12 +14,16 @@ const PAGE_SIZE = 20;
 
 export default function Titles() {
   const location = useLocation();
+  const requestVersion = useRef(0);
   const [term, setTerm] = useState("");
   const [query, setQuery] = useState("");
+  const [source, setSource] = useState("all");
+  const [warnings, setWarnings] = useState([]);
+  const [nextOffset, setNextOffset] = useState({ mangadex: 0, mangapill: 0 });
+  const [hasMore, setHasMore] = useState(false);
   const [country, setCountry] = useState("ALL");
   const [section, setSection] = useState("all");
   const [items, setItems] = useState([]);
-  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
@@ -37,30 +41,43 @@ export default function Titles() {
 
   useEffect(() => {
     let active = true;
+    requestVersion.current += 1;
+    setLoadingMore(false);
+    setWarnings([]);
+    setPicked(null);
+    setItems([]);
+    setHasMore(false);
     setLoading(true);
     setError("");
-    base44.functions
-      .invoke("mangadexSearch", { query, country, section, limit: PAGE_SIZE, offset: 0 })
+    mangaClient
+      .invoke("mangadexSearch", { query, country, section, source, limit: PAGE_SIZE, offset: 0 })
       .then((res) => {
         if (!active) return;
         setItems(res.data.items || []);
-        setTotal(res.data.total || 0);
+        setNextOffset(res.data.nextOffset);
+        setHasMore(res.data.hasMore);
+        setWarnings(res.data.warnings || []);
       })
       .catch((err) => { if (active) setError(err?.response?.data?.error || err.message || "Unexpected error"); })
       .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
-  }, [query, country, section, attempt]);
+    return () => { active = false; requestVersion.current += 1; };
+  }, [query, country, section, source, attempt]);
 
   const loadMore = () => {
+    const version = requestVersion.current;
+    setError("");
     setLoadingMore(true);
-    base44.functions
-      .invoke("mangadexSearch", { query, country, section, limit: PAGE_SIZE, offset: items.length })
+    mangaClient
+      .invoke("mangadexSearch", { query, country, section, source, limit: PAGE_SIZE, offset: nextOffset })
       .then((res) => {
-        setItems((prev) => [...prev, ...(res.data.items || [])]);
-        setTotal(res.data.total || 0);
+        if (version !== requestVersion.current) return;
+        setItems((prev) => [...new Map([...prev, ...(res.data.items || [])].map(item => [item.id, item])).values()]);
+        setNextOffset(res.data.nextOffset);
+        setHasMore(res.data.hasMore);
+        setWarnings(res.data.warnings || []);
       })
-      .catch((err) => setError(err?.response?.data?.error || err.message || "Unexpected error"))
-      .finally(() => setLoadingMore(false));
+      .catch((err) => { if (version === requestVersion.current) setError(err?.response?.data?.error || err.message || "Unexpected error"); })
+      .finally(() => { if (version === requestVersion.current) setLoadingMore(false); });
   };
 
   const random = () => {
@@ -79,7 +96,7 @@ export default function Titles() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: "easeOut" }}>
             <div className="flex items-center gap-2 text-primary text-sm font-bold uppercase tracking-[0.25em] mb-4"><Library className="h-4 w-4" /> Titles</div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tighter bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent animate-gradient-x">Advanced Search</h1>
-            <p className="mt-4 text-foreground/70 max-w-xl">Browse the whole catalogue. Filter by origin, shelf, or search by name.</p>
+            <p className="mt-4 text-foreground/70 max-w-xl">Search MangaDex and MangaPill together. Filter by origin, shelf, or name.</p>
             <form onSubmit={(e) => { e.preventDefault(); setQuery(term); }} className="mt-8 flex flex-col sm:flex-row gap-3 max-w-2xl">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -114,6 +131,7 @@ export default function Titles() {
           <AnimatedElement>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               <div className="flex items-center gap-2 text-sm font-semibold"><SlidersHorizontal className="h-4 w-4 text-primary" /> Filters</div>
+              <label className="flex items-center gap-2 text-sm">Source<select aria-label="Manga source" value={source} onChange={(e) => setSource(e.target.value)} className="bg-background border border-border px-3 py-2"><option value="all">All sources</option><option value="mangadex">MangaDex</option><option value="mangapill">MangaPill</option></select></label>
               <Tabs value={country} onValueChange={setCountry}>
                 <TabsList className="rounded-none">
                   <TabsTrigger value="ALL" className="rounded-none">All</TabsTrigger>
@@ -132,14 +150,16 @@ export default function Titles() {
             </div>
           </AnimatedElement>
 
+          {warnings.map(message => <p key={message} role="status" className="text-sm text-muted-foreground mb-4">{message}</p>)}
+
           {loading && <GridSkeleton count={10} />}
 
           {!loading && error && <LoadError message={error} onRetry={() => setAttempt((a) => a + 1)} />}
 
-          {!loading && !error && (
+          {!loading && (!error || items.length > 0) && (
             <>
               <div className="text-sm text-muted-foreground mb-4">
-                {items.length} of {total} titles
+                {items.length} titles loaded
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                 {items.map((t, i) => (
@@ -150,7 +170,7 @@ export default function Titles() {
               </div>
               {items.length === 0 && <div className="text-center py-16 text-muted-foreground">No titles match your filters.</div>}
 
-              {items.length > 0 && items.length < total && (
+              {items.length > 0 && hasMore && (
                 <div className="mt-10 flex justify-center">
                   <Button variant="outline" onClick={loadMore} disabled={loadingMore} className="rounded-none h-11 px-8">
                     {loadingMore ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Loading...</> : "Load more titles"}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { mangaClient } from "@/api/mangaClient";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { InlineLoader, LoadError } from "@/components/manga/DataStates";
@@ -18,7 +18,7 @@ export default function ChapterReader() {
     setError("");
     setData(null);
     window.scrollTo({ top: 0 });
-    base44.functions
+    mangaClient
       .invoke("mangadexChapter", { id })
       .then((res) => { if (active) setData(res.data); })
       .catch((err) => { if (active) setError(err?.response?.data?.error || err.message || "Unexpected error"); })

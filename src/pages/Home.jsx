@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { mangaClient } from "@/api/mangaClient";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Star, Flame, Zap } from "lucide-react";
 import AnimatedElement from "@/components/manga/AnimatedElement";
@@ -50,7 +50,7 @@ export default function Home() {
     let active = true;
     setLoading(true);
     setError("");
-    base44.functions
+    mangaClient
       .invoke("mangadexHome", {})
       .then((res) => { if (active) setData(res.data); })
       .catch((err) => { if (active) setError(err?.response?.data?.error || err.message || "Unexpected error"); })
@@ -91,6 +91,7 @@ export default function Home() {
 
       {!loading && !error && data && (
         <>
+          {data.warnings?.map(message => <p key={message} role="status" className="max-w-7xl mx-auto px-4 py-3 text-sm text-muted-foreground">{message}</p>)}
           <HeroSpotlight items={data.spotlight || []} />
 
           {latest.length > 0 && (
