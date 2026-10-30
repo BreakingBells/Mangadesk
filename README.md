@@ -1,6 +1,6 @@
 # Base44 Project
 
-Use this repository to run and edit the app locally, then publish changes back through Base44.
+Use this repository to run and edit the app locally. Publish the Netlify site through a production build as described below.
 
 Any change pushed to the repo will also be reflected in the Base44 Builder.
 
@@ -45,13 +45,33 @@ base44 dev --remote
 
 ## Publish Your Changes
 
-After pushing your changes to git, open the Base44 dashboard and publish the app:
+This site uses Netlify Database for the personal library. Publishing an existing
+deploy preview directly to production is not supported for sites with a database.
+Production must run its own build so Netlify can apply database migrations to the
+production database before publishing the new application.
 
-```bash
-base44 dashboard open
-```
+Use one of these supported workflows:
 
-This repo syncs to Base44 through git, so publish from the dashboard rather than `base44 deploy` â a CLI deploy ships your local tree directly, bypassing the sync, and the deployed state silently diverges from the repo.
+- **Agent runs:** Use **Publish** on the agent run page. This is the supported
+  publishing action for these changes; do not promote the deploy preview from
+  its deploy details page.
+- **Git-based changes:** Merge the feature branch into `main`, this site's
+  production branch. The merge triggers a production build and deployment.
+
+Keep the application changes and all database migration files together in the
+published source. Netlify applies pending migrations automatically before the
+production deploy becomes available. If a migration fails, resolve the failure
+and trigger another production build.
+
+Already-applied migration files must remain unchanged in the repository. Make
+future schema changes with a new migration. Do not manually apply migrations or
+copy a preview database connection into production. Preview libraries and
+production libraries use separate database branches; preview library entries
+are not transferred by publishing the application.
+
+The Base44 Builder continues to sync from git separately. Publishing in Base44
+does not replace the Netlify production build required for this site's functions
+and database.
 
 ## Docs & Support
 
@@ -101,5 +121,7 @@ not require login and does not sync across browsers or devices. Clearing the
 browser's site cookies disconnects that browser from its saved collection.
 
 Database migrations are generated into `netlify/database/migrations` and applied
-automatically by Netlify during deployment. Do not apply migrations manually.
+automatically by Netlify during deployment. Production migrations require a
+production build; follow **Publish Your Changes** above. Do not apply migrations
+manually.
 Run `node --test tests/*.test.mjs` for API validation and library-isolation tests.
