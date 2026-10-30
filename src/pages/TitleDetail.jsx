@@ -7,6 +7,7 @@ import { ArrowLeft, BookOpen, Clock, Loader2, Users } from "lucide-react";
 import AnimatedElement from "@/components/manga/AnimatedElement";
 import { InlineLoader, LoadError } from "@/components/manga/DataStates";
 import timeAgo from "@/lib/timeAgo";
+import LibraryControl from "@/components/manga/LibraryControl";
 
 export default function TitleDetail() {
   const { id } = useParams();
@@ -102,6 +103,8 @@ export default function TitleDetail() {
               <p className="mt-6 text-muted-foreground leading-relaxed whitespace-pre-line max-w-3xl">
                 {manga.description || "No description available for this title yet."}
               </p>
+
+              <LibraryControl key={manga.id} manga={manga} />
 
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 {firstChapter ? (

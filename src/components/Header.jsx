@@ -34,7 +34,7 @@ export default function Header() {
           <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">MangaDesk</span>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-2 text-sm font-medium">
+        <nav className="hidden xl:flex items-center gap-2 text-sm font-medium">
           <Link to="/" className="px-3 py-2 rounded-md hover:bg-muted/80 hover:text-primary transition-all duration-200">Home</Link>
           <DropdownMenu>
             <DropdownMenuTrigger className="px-3 py-2 rounded-md hover:bg-muted/80 hover:text-primary transition-all duration-200 flex items-center gap-1.5 outline-none group">
@@ -55,12 +55,13 @@ export default function Header() {
               <DropdownMenuItem asChild className="cursor-pointer hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary"><a href="#">Proxy Browser</a></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Link to="/Library" className="px-3 py-2 rounded-md hover:bg-muted/80 hover:text-primary transition-colors flex items-center gap-1.5"><Library className="h-4 w-4" /> My Library</Link>
           <Link to="/Settings" className="px-3 py-2 rounded-md hover:bg-muted/80 hover:text-primary transition-all duration-200 flex items-center gap-1.5 group">
             <Settings className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" /> Settings
           </Link>
         </nav>
 
-        <form onSubmit={submit} className="flex items-center gap-2 ml-auto lg:ml-0">
+        <form onSubmit={submit} className="flex items-center gap-2 ml-auto xl:ml-0">
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
@@ -78,7 +79,7 @@ export default function Header() {
         </form>
 
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild className="lg:hidden">
+          <SheetTrigger asChild className="xl:hidden">
             <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary text-foreground"><Menu className="h-5 w-5" /></Button>
           </SheetTrigger>
           <SheetContent side="right" className="bg-background/95 backdrop-blur-xl border-l-border/50 text-foreground w-72">
@@ -87,6 +88,7 @@ export default function Header() {
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                 <Input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Search manga..." aria-label="Search manga titles" className="pl-8 rounded-lg" />
               </form>
+              <Link to="/Library" onClick={() => setOpen(false)} className="hover:text-primary transition-colors flex items-center gap-2"><Library className="h-4 w-4" /> My Library</Link>
               <Link to="/" onClick={() => setOpen(false)} className="hover:text-primary transition-colors">Home</Link>
               
               <div className="flex flex-col gap-3">

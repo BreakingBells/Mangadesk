@@ -86,3 +86,20 @@ Use Netlify Dev on port 8889 when testing this integration locally. Upstream
 outages appear as availability notices while successful sources remain visible.
 
 Run the source integration checks with `node --test tests/*.test.mjs`.
+
+## Personal library
+
+Open a manga title and choose Currently Reading, Plan to Read, or Completed from
+its library selector. My Library in the desktop or mobile navigation opens the
+saved collection, with shelf counts, title search, shelf changes, and removal.
+Both manga sources are supported, with separate entries for each source.
+
+Library entries persist in Netlify Database using the Drizzle schema in
+`db/schema.ts`. A private HttpOnly browser cookie identifies the collection;
+entries are scoped to its hash on every database operation. This library does
+not require login and does not sync across browsers or devices. Clearing the
+browser's site cookies disconnects that browser from its saved collection.
+
+Database migrations are generated into `netlify/database/migrations` and applied
+automatically by Netlify during deployment. Do not apply migrations manually.
+Run `node --test tests/*.test.mjs` for API validation and library-isolation tests.
